@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>전자서명 접수</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, 'Malgun Gothic', sans-serif; margin: 0; background: #f4f5f7; color: #1f2329; }
+    main { max-width: 520px; margin: 0 auto; padding: 20px 16px 40px; }
+    h1 { font-size: 20px; margin: 8px 0 14px; }
+    .tabs { display: flex; background: #e3e6ea; border-radius: 10px; padding: 4px; }
+    .tabs button {
+      flex: 1; padding: 11px; font-size: 15px; font-weight: 600; border: 0; border-radius: 8px;
+      background: transparent; color: #5c6570; cursor: pointer;
+    }
+    .tabs button.on { background: #fff; color: #1f2329; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+    .lead { font-size: 14px; color: #5c6570; margin: 12px 0 4px; line-height: 1.5; }
+    label { display: block; font-size: 14px; font-weight: 600; margin: 16px 0 6px; }
+    .hint { font-weight: 400; color: #7a828c; font-size: 12px; display: block; margin-top: 2px; }
+    input[type=text], input[type=email], input[type=tel] {
+      width: 100%; padding: 12px; font-size: 16px; border: 1px solid #cfd4da; border-radius: 8px; background: #fff;
+    }
+    input:focus { outline: 2px solid #2f6fed; border-color: #2f6fed; }
+    .photo-btn {
+      display: block; width: 100%; padding: 14px; text-align: center; border: 1px dashed #9aa3ad;
+      border-radius: 8px; background: #fff; font-size: 15px; font-weight: 400; cursor: pointer; margin: 0;
+    }
+    #photos { display: none; }
+    #thumbs { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .thumb { position: relative; width: 78px; }
+    .thumb img { width: 78px; height: 104px; object-fit: cover; border-radius: 6px; border: 1px solid #cfd4da; display: block; }
+    .thumb span { display: block; text-align: center; font-size: 12px; color: #5c6570; margin-top: 2px; }
+    .thumb button {
+      position: absolute; top: -7px; right: -7px; width: 24px; height: 24px; border: 0; border-radius: 50%;
+      background: #1f2329; color: #fff; font-size: 14px; line-height: 24px; padding: 0; cursor: pointer;
+    }
+    #submit {
+      width: 100%; margin-top: 24px; padding: 14px; font-size: 16px; font-weight: 600; color: #fff;
+      background: #2f6fed; border: 0; border-radius: 8px; cursor: pointer;
+    }
+    #submit:disabled { background: #9db7f0; }
+    #msg { margin-top: 14px; font-size: 14px; line-height: 1.5; }
+    #msg.err { color: #c62828; }
+    #done { display: none; background: #fff; border-radius: 10px; padding: 24px 18px; text-align: center; }
+    #done .id { font-size: 22px; font-weight: 700; margin: 10px 0; }
+    #again { padding: 10px 18px; font-size: 15px; border: 1px solid #cfd4da; border-radius: 8px; background: #fff; cursor: pointer; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+<main>
+  <form id="form">
+    <h1>전자서명 접수</h1>
+
+    <div class="tabs" role="tablist">
+      <button type="button" id="tabC" class="on" role="tab">법인</button>
+      <button type="button" id="tabP" role="tab">개인 · 개인사업자</button>
+    </div>
+    <p class="lead" id="lead"></p>
+
+    <p class="lead"><b>계약 당사자 본인 혹은 대표자</b> 정보로 입력해 주세요.</p>
+
+    <label for="agency">대리점명</label>
+    <input type="text" id="agency" maxlength="40" required>
+
+    <!-- 개인 -->
+    <div id="boxP" hidden>
+      <label for="pName">성함 (계약 당사자 본인 혹은 대표자)
+        <span class="hint">휴대폰 명의자 실명과 같아야 본인인증이 됩니다.</span>
+      </label>
+      <input type="text" id="pName" maxlength="30">
+
+      <label for="phone">연락처 (휴대폰)</label>
+      <input type="tel" id="phone" inputmode="numeric" placeholder="010-0000-0000" maxlength="13">
+
+      <label for="bizName">거래처명
+        <span class="hint">상호(가게 이름). 성함과 같으면 성함을 그대로 적어 주세요.</span>
+      </label>
+      <input type="text" id="bizName" maxlength="40">
+    </div>
+
+    <!-- 법인 -->
+    <div id="boxC">
+      <label for="cName">상호명
+        <span class="hint">사업자등록증에 적힌 그대로 입력해 주세요. 인증서 명칭과 다르면 인증이 실패합니다.</span>
+      </label>
+      <input type="text" id="cName" maxlength="30">
+
+      <label for="bizNo">사업자등록번호</label>
+      <input type="text" id="bizNo" inputmode="numeric" placeholder="000-00-00000" maxlength="12">
+
+      <label for="email">받는 사람 이메일
+        <span class="hint">공동인증서가 있는 PC에서 확인할 수 있는 주소</span>
+      </label>
+      <input type="email" id="email">
+    </div>
+
+    <label for="custNo">고객번호
+      <span class="hint">선택 입력. 모르면 비워 두세요.</span>
+    </label>
+    <input type="text" id="custNo" maxlength="40">
+
+    <label>계약 서류 사진
+      <span class="hint">계약서와 CMS 신청서 등 관련 서류를 모두 올려 주세요. 수정·정정한 부분이 있으면 그 면도 함께 찍어 주세요. 세로로, 한 장씩 전체가 보이게. 최대 20장</span>
+    </label>
+    <label class="photo-btn" for="photos">사진 찍기 / 선택</label>
+    <input type="file" id="photos" accept="image/*" multiple>
+    <div id="thumbs"></div>
+
+    <button type="submit" id="submit">접수하기</button>
+    <div id="msg"></div>
+  </form>
+
+  <div id="done">
+    <div id="doneText"></div>
+    <div class="id" id="doneId"></div>
+    <p class="lead">접수번호를 계약서 여백에 적어 두면 나중에 확인하기 쉽습니다.</p>
+    <button type="button" id="again">다음 건 접수</button>
+  </div>
+</main>
+
+<script>
+  var MAX_PHOTOS = 20;
+  // 접수를 받는 구글 스크립트 주소
+  var API_URL = 'https://script.google.com/macros/s/AKfycby8aEOXy48UyrTtHl_9C-AXsw1dqCmTuBNy2US7z2J691wtBj4hNUXzZ-URV4tOUq4V6g/exec';
+  // 사진을 3:4 흰 바탕에 맞춰 넣는다. 확인서 뒤에 한 쪽에 한 장씩 같은 크기로 들어간다.
+  var OUT_W = 1200, OUT_H = 1600;
+  var kind = '법인';
+  var photos = [];   // dataUrl 목록 (순서 = 문서에 들어가는 순서)
+
+  var $ = function (id) { return document.getElementById(id); };
+  var LEAD = {
+    '개인': '접수하면 고객 휴대폰으로 카카오톡 서명 요청이 갑니다. 고객은 휴대폰 본인인증 후 서명합니다.',
+    '법인': '접수하면 입력한 이메일로 서명 요청이 갑니다. 고객은 PC에서 사업자(법인) 공동인증서로 서명합니다.'
+  };
+
+  function setKind(k) {
+    kind = k;
+    $('tabP').className = k === '개인' ? 'on' : '';
+    $('tabC').className = k === '법인' ? 'on' : '';
+    $('boxP').hidden = k !== '개인';
+    $('boxC').hidden = k !== '법인';
+    $('lead').textContent = LEAD[k];
+    showMsg('', false);
+  }
+  $('tabP').onclick = function () { setKind('개인'); };
+  $('tabC').onclick = function () { setKind('법인'); };
+  setKind('법인');
+
+  $('bizNo').addEventListener('input', function (e) {
+    var d = e.target.value.replace(/\D/g, '').slice(0, 10);
+    var out = d.slice(0, 3);
+    if (d.length > 3) out += '-' + d.slice(3, 5);
+    if (d.length > 5) out += '-' + d.slice(5);
+    e.target.value = out;
+  });
+
+  $('phone').addEventListener('input', function (e) {
+    var d = e.target.value.replace(/\D/g, '').slice(0, 11);
+    var out = d.slice(0, 3);
+    if (d.length > 3) out += '-' + d.slice(3, 7);
+    if (d.length > 7) out += '-' + d.slice(7);
+    e.target.value = out;
+  });
+
+  $('photos').addEventListener('change', function (e) {
+    var files = Array.prototype.slice.call(e.target.files);
+    e.target.value = '';
+    var skipped = false;
+    files.reduce(function (p, f) {
+      return p.then(function () {
+        if (photos.length >= MAX_PHOTOS) { skipped = true; return; }
+        return fit(f).then(function (dataUrl) { photos.push(dataUrl); renderThumbs(); });
+      });
+    }, Promise.resolve()).then(function () {
+      showMsg(skipped ? '사진은 ' + MAX_PHOTOS + '장까지만 올릴 수 있어 나머지는 빠졌습니다.' : '', skipped);
+    }).catch(function () { showMsg('사진을 읽지 못했습니다. 다시 선택해 주세요.', true); });
+  });
+
+  function fit(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () {
+        var c = document.createElement('canvas');
+        c.width = OUT_W; c.height = OUT_H;
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, OUT_W, OUT_H);
+        var s = Math.min(OUT_W / img.width, OUT_H / img.height);
+        var w = img.width * s, h = img.height * s;
+        ctx.drawImage(img, (OUT_W - w) / 2, (OUT_H - h) / 2, w, h);
+        URL.revokeObjectURL(url);
+        resolve(c.toDataURL('image/jpeg', 0.8));
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('image')); };
+      img.src = url;
+    });
+  }
+
+  function renderThumbs() {
+    var box = $('thumbs');
+    box.innerHTML = '';
+    photos.forEach(function (src, i) {
+      var div = document.createElement('div');
+      div.className = 'thumb';
+      var img = document.createElement('img');
+      img.src = src;
+      img.alt = '서류 사진 ' + (i + 1);
+      var cap = document.createElement('span');
+      cap.textContent = (i + 1) + '쪽';
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = '×';
+      btn.setAttribute('aria-label', (i + 1) + '번 사진 삭제');
+      btn.onclick = function () { photos.splice(i, 1); renderThumbs(); };
+      div.appendChild(img); div.appendChild(cap); div.appendChild(btn);
+      box.appendChild(div);
+    });
+  }
+
+  function showMsg(text, isErr) {
+    $('msg').textContent = text;
+    $('msg').className = isErr ? 'err' : '';
+  }
+
+  $('form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var isCorp = kind === '법인';
+    var name = (isCorp ? $('cName') : $('pName')).value.trim();
+    if (!name) { showMsg((isCorp ? '상호명' : '성함') + '을 입력해 주세요.', true); return; }
+    if (isCorp && $('bizNo').value.replace(/\D/g, '').length !== 10) { showMsg('사업자등록번호 10자리를 입력해 주세요.', true); return; }
+    if (isCorp && !$('email').value.trim()) { showMsg('받는 사람 이메일을 입력해 주세요.', true); return; }
+    if (!isCorp && $('phone').value.replace(/\D/g, '').length < 10) { showMsg('휴대폰 번호를 입력해 주세요.', true); return; }
+    if (!isCorp && !$('bizName').value.trim()) { showMsg('거래처명을 입력해 주세요. 성함과 같으면 성함을 그대로 적어 주세요.', true); return; }
+    if (photos.length === 0) { showMsg('계약 서류 사진을 올려 주세요.', true); return; }
+
+    var data = {
+      kind: kind,
+      agency: $('agency').value,
+      custNo: $('custNo').value,
+      bizName: $('bizName').value,
+      name: name,
+      phone: $('phone').value,
+      bizNo: $('bizNo').value,
+      email: $('email').value,
+      code: $('code') ? $('code').value : '',
+      photos: photos
+    };
+    $('submit').disabled = true;
+    showMsg('접수 중입니다. 사진이 많으면 시간이 걸릴 수 있습니다.', false);
+    // 본문을 text/plain으로 보내야 브라우저가 사전 요청 없이 바로 보낸다.
+    fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(data),
+      redirect: 'follow'
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.error || '접수에 실패했습니다.');
+        $('form').style.display = 'none';
+        $('doneText').textContent = res.sent
+          ? (isCorp ? '접수되었습니다. 이메일로 서명 요청을 보냈습니다.' : '접수되었습니다. 카카오톡으로 서명 요청을 보냈습니다.')
+          : '접수되었습니다. 담당자 확인 후 서명 요청이 발송됩니다.';
+        $('doneId').textContent = res.id;
+        $('done').style.display = 'block';
+      })
+      .catch(function (err) {
+        $('submit').disabled = false;
+        showMsg(err && err.message && err.message !== 'Failed to fetch'
+          ? err.message : '접수에 실패했습니다. 잠시 후 다시 시도해 주세요.', true);
+      });
+  });
+
+  $('again').addEventListener('click', function () {
+    var agency = $('agency').value;
+    $('form').reset();
+    $('agency').value = agency;   // 같은 대리점이 이어서 접수하기 쉽게 유지
+    photos = [];
+    renderThumbs();
+    showMsg('', false);
+    $('submit').disabled = false;
+    $('done').style.display = 'none';
+    $('form').style.display = 'block';
+  });
+</script>
+</body>
+</html>
