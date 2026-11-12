@@ -103,7 +103,7 @@
     <input type="text" id="custNo" maxlength="40">
 
     <label>계약 서류 사진
-      <span class="hint">계약서와 CMS 신청서 등 관련 서류를 모두 올려 주세요. 수정·정정한 부분이 있으면 그 면도 함께 찍어 주세요. 세로로, 한 장씩 전체가 보이게. 최대 20장</span>
+      <span class="hint">계약서와 CMS 신청서 등 관련 서류를 모두 올려 주세요. 수정·정정한 부분이 있으면 그 면도 함께 찍어 주세요. 세로로, 한 장씩 전체가 보이게. 최대 10장</span>
     </label>
     <label class="photo-btn" for="photos">사진 찍기 / 선택</label>
     <input type="file" id="photos" accept="image/*" multiple>
@@ -122,7 +122,7 @@
 </main>
 
 <script>
-  var MAX_PHOTOS = 20;
+  var MAX_PHOTOS = 10;
   // 접수를 받는 구글 스크립트 주소
   var API_URL = 'https://script.google.com/macros/s/AKfycby8aEOXy48UyrTtHl_9C-AXsw1dqCmTuBNy2US7z2J691wtBj4hNUXzZ-URV4tOUq4V6g/exec';
   // 사진을 3:4 흰 바탕에 맞춰 넣는다. 확인서 뒤에 한 쪽에 한 장씩 같은 크기로 들어간다.
